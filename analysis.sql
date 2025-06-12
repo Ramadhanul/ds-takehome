@@ -33,3 +33,40 @@ SELECT
     ELSE 'Others'
   END AS customer_segment
 FROM rfm_score;
+
+
+-- Repeat purchase bulanan
+WITH monthly_orders AS (
+  SELECT
+    customer_id,
+    strftime('%Y-%m', order_date) AS order_month,
+    COUNT(order_id) AS order_count
+  FROM transactions
+  GROUP BY customer_id, order_month
+)
+SELECT
+  customer_id,
+  order_month,
+  order_count
+FROM monthly_orders
+WHERE order_count > 1
+ORDER BY order_month, customer_id;
+
+
+-- EXPLAIN QUERY PLAN untuk repeat-purchase query
+EXPLAIN QUERY PLAN
+WITH monthly_orders AS (
+  SELECT
+    customer_id,
+    strftime('%Y-%m', order_date) AS order_month,
+    COUNT(order_id) AS order_count
+  FROM transactions
+  GROUP BY customer_id, order_month
+)
+SELECT
+  customer_id,
+  order_month,
+  order_count
+FROM monthly_orders
+WHERE order_count > 1
+ORDER BY order_month, customer_id;
